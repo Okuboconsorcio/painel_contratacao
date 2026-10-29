@@ -41,6 +41,13 @@ compartilhado, Vercel própria).
   recusado, reserva única de e-mail, envio, limpeza, apagar pessoa inteira,
   usuário comum barrado na leitura e na gravação). Conferido depois: tabelas
   vazias. Nicolas cadastrado como `master` (mesmo login do Polaris).
+- **GitHub:** `Okuboconsorcio/painel_contratacao` (criado pelo Nicolas): `main`
+  só com o README; o código em `feat/inicial`.
+- **Vercel:** projeto `painel-contratacao` (time okuboconsorcios-projects),
+  ligado ao repositório, com `NEXT_PUBLIC_SUPABASE_URL` e
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Só versão de teste por branch;
+  produção (`main`) só depois do "aprovado". Faltam as variáveis secretas, que
+  o Nicolas cola na Vercel.
 
 ## 2026-10-29 (fim da tarde) — Endereço, dia de início e limpeza LGPD (Claude Code)
 
