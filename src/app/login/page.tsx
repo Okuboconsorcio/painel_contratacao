@@ -8,10 +8,12 @@ const AVISOS: Record<string, string> = {
   saiu: "Você saiu do painel.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function Login({ searchParams }: { searchParams: Promise<{ aviso?: string }> }) {
+  const { aviso } = await searchParams;
   // No protótipo não há login.
   if (!modoSupabase()) redirect("/rh/recrutamento");
-  const { aviso } = await searchParams;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4">

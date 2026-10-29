@@ -15,6 +15,9 @@ import { trocarPapelAcao } from "./rh/recrutamento/actions";
  * da Vercel (`/api/cron/recrutamento`) faz o mesmo uma vez por dia, para o
  * lembrete das 9h sair mesmo sem ninguém abrir o painel.
  */
+// Toda tela lê o banco na hora: nada de montar a página no build e servir dado velho.
+export const dynamic = "force-dynamic";
+
 export default async function LayoutPainel({ children }: { children: React.ReactNode }) {
   const agora = new Date();
   await rotinas(agora);

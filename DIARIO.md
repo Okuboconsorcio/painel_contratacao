@@ -48,6 +48,14 @@ compartilhado, Vercel própria).
   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Só versão de teste por branch;
   produção (`main`) só depois do "aprovado". Faltam as variáveis secretas, que
   o Nicolas cola na Vercel.
+- **Defeito achado no build da Vercel:** o Next montava o Painel no build, como
+  página fixa (no computador passava porque lia o arquivo local). Com banco de
+  verdade, a tela mostraria dado velho. Agora `dynamic = "force-dynamic"` na
+  moldura `(portal)/layout.tsx` e no login. Conferido com `VERCEL=1 npm run
+  build` sem chaves: todas as telas `ƒ` (na hora).
+- **Primeira publicação = produção** na Vercel (regra para projeto novo):
+  cancelada antes de ficar pronta. Trava "Ignored Build Step" pula produção
+  até o "aprovado".
 
 ## 2026-10-29 (fim da tarde) — Endereço, dia de início e limpeza LGPD (Claude Code)
 
