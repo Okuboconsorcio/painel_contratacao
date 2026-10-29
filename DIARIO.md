@@ -2,6 +2,15 @@
 
 O que mudou e **por quê**. O mais novo em cima.
 
+## 2026-10-29 (noite) — Produção (Claude Code, aprovado pelo Nicolas)
+
+Nicolas testou a versão de teste ("entrei, funcionou") e aprovou: trava da
+Vercel retirada, `main` avançado até `7d2b3a1`, produção em
+https://painel-contratacao.vercel.app (sem login da Vercel). Conferido de fora:
+`/` → `/login`, login 200, lista pública de vagas lendo o banco, agendador 401
+sem segredo. Daqui em diante: branch → versão de teste → "aprovado" → `main`.
+Teste e produção usam o mesmo banco.
+
 ## 2026-10-29 (noite) — Sistema separado: Supabase, login e e-mail de verdade (Claude Code)
 
 **Pedido do Nicolas:** não colocar no Polaris agora; fazer sistema separado, já.
