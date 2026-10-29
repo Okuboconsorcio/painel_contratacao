@@ -1,0 +1,14 @@
+/node_modules
+/.next/
+/out/
+/build
+.DS_Store
+*.pem
+npm-debug.log*
+.env*
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+
+# Dados locais do protótipo (candidatos e currículos de teste). Não vão para o Git.
+/.dados/

@@ -1,0 +1,339 @@
+/*
+ * `source(none)` desliga a varredura automática, e `@source` liga de volta
+ * apontando só para `src` — onde as classes realmente existem.
+ *
+ * Sem isso o Tailwind lê TODO arquivo do projeto atrás de nome de classe,
+ * inclusive comentário, documentação e diário. Um trecho de texto entre
+ * colchetes com dois-pontos dentro (um formato de hora, por exemplo) vira uma
+ * regra CSS inválida e **derruba a compilação de produção** — sem reclamar nada
+ * em desenvolvimento, que é onde a gente trabalha.
+ *
+ * Isso já quebrou a publicação duas vezes. A segunda foi ao escrever, no
+ * diário, o aviso sobre a primeira.
+ */
+@import "tailwindcss" source(none);
+@source "../";
+
+/*
+ * Polaris — sistema visual
+ *
+ * A ideia: o sistema é um céu noturno pelo qual você navega e uma mesa iluminada
+ * onde você trabalha. Toda a "moldura" (barra lateral, faixa do topo) é céu; a
+ * área de conteúdo é dia. A estrela é o que orienta, não o que se lê em cima.
+ *
+ * Por isso não há estrela nenhuma atrás de tabela: quem passa o dia lendo 300
+ * linhas de contrato não precisa de brilho no caminho.
+ */
+
+:root {
+  /* ─── Céu: a moldura ───────────────────────────────────────────────────── */
+  --horizonte: #04081c; /* o mais fundo — bordas do gradiente */
+  --ceu: #081235; /* corpo da barra lateral */
+  --royal: #12245e; /* azul royal — realces e gradiente */
+  --royal-vivo: #2a46c8; /* foco e estados ativos */
+  --estrela: #eef3ff; /* branco levemente azulado */
+  --polaris: #f2c75c; /* a estrela: branco-dourado, como a de verdade */
+
+  /* ─── Dia: a mesa de trabalho ──────────────────────────────────────────── */
+  --background: #f4f6fc;
+  --superficie: #ffffff;
+  --foreground: #0b1230;
+  --tenue: #5a648a; /* texto secundário */
+  --linha: #dde3f2; /* fios de contorno */
+
+  /*
+   * Nomes antigos, reapontados para a paleta nova. Dezenas de telas usam
+   * `text-navy-900`, `bg-navy-950`, `text-gold-400` — reapontando aqui, todas
+   * mudam de tom sem precisar ser editadas uma a uma.
+   */
+  --navy-950: #050b22;
+  --navy-900: #0b1540;
+  --navy-800: #16277a;
+  --gold-400: #f2c75c;
+  --gold-500: #d9a83a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-superficie: var(--superficie);
+  --color-tenue: var(--tenue);
+  --color-linha: var(--linha);
+
+  --color-horizonte: var(--horizonte);
+  --color-ceu: var(--ceu);
+  --color-royal: var(--royal);
+  --color-royal-vivo: var(--royal-vivo);
+  --color-estrela: var(--estrela);
+  --color-polaris: var(--polaris);
+
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-gold-400: var(--gold-400);
+  --color-gold-500: var(--gold-500);
+
+  --font-sans: var(--font-instrument-sans);
+  --font-display: var(--font-archivo);
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+}
+
+/*
+ * Números em colunas precisam alinhar: valor, CPF, contrato, parcela. Ligado no
+ * documento inteiro porque este é um sistema de números — a exceção seria o
+ * texto corrido, e aqui quase não existe.
+ */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  /* ─── Superfícies ────────────────────────────────────────────────────────── */
+
+  /* O cartão padrão da área de trabalho: fio azulado e sombra fria, nunca cinza. */
+  .painel {
+    background: var(--superficie);
+    border: 1px solid var(--linha);
+    border-radius: 14px;
+    box-shadow:
+      0 1px 2px rgba(11, 18, 48, 0.04),
+      0 8px 24px -16px rgba(18, 36, 94, 0.28);
+  }
+
+  /* ─── Tipografia ─────────────────────────────────────────────────────────── */
+
+  /*
+   * A Archivo tem eixo de largura. A marca sai levemente expandida — é o que a
+   * torna reconhecível de longe e o que nenhuma fonte no ajuste padrão faz.
+   */
+  .marca {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 112;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .titulo-pagina {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 100;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  /* Rótulo pequeno acima do título: diz de que bloco a tela faz parte. */
+  .sobrancelha {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 108;
+    font-weight: 600;
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* ─── Formulários ────────────────────────────────────────────────────────── */
+
+  /*
+   * Campo de filtro e de busca. O anel de foco é o azul royal vivo — é o único
+   * lugar da área clara onde a cor da marca aparece cheia, então serve de guia
+   * para o olho ao percorrer os filtros com o teclado.
+   */
+  .campo {
+    width: 100%;
+    background: var(--superficie);
+    border: 1px solid var(--linha);
+    border-radius: 9px;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.83rem;
+    color: var(--foreground);
+    outline: none;
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  .campo:hover {
+    border-color: color-mix(in srgb, var(--royal) 28%, var(--linha));
+  }
+
+  .campo:focus {
+    border-color: var(--royal-vivo);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--royal-vivo) 16%, transparent);
+  }
+
+  .rotulo-campo {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--tenue);
+    margin-bottom: 0.25rem;
+  }
+
+  /* ─── Tabelas ────────────────────────────────────────────────────────────── */
+
+  /* Cabeçalho de coluna: pequeno, espaçado e discreto — o dado é que importa. */
+  .cabecalho-tabela {
+    font-family: var(--font-display);
+    /* Um pouco condensada: o espaçamento entre letras alarga o rótulo, e
+       cabeçalho de coluna que quebra em duas linhas desalinha a tabela toda. */
+    font-variation-settings: "wdth" 94;
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--tenue);
+  }
+
+  .cabecalho-tabela th {
+    white-space: nowrap;
+  }
+
+  /*
+   * Número de cartão de painel. A Archivo é mais larga que a fonte do corpo, e
+   * "R$ 146.666,67" não cabia em coluna de painel com seis cartões lado a lado
+   * — daí a largura reduzida. Continua sendo a mesma fonte dos títulos.
+   */
+  .numero-painel {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 88;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Rótulo de cartão de painel: mais apertado que a sobrancelha de título,
+     senão "Crédito total vendido" quebra em três linhas. */
+  .rotulo-painel {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 98;
+    font-weight: 600;
+    font-size: 0.63rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+}
+
+/* ─── Céu ────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .ceu-fundo {
+    background:
+      radial-gradient(
+        120% 80% at 12% -10%,
+        rgba(42, 70, 200, 0.42) 0%,
+        transparent 62%
+      ),
+      radial-gradient(
+        90% 60% at 100% 110%,
+        rgba(18, 36, 94, 0.7) 0%,
+        transparent 70%
+      ),
+      linear-gradient(168deg, var(--ceu) 0%, var(--horizonte) 100%);
+  }
+}
+
+/*
+ * As estrelas piscam devagar e fora de compasso. Só um punhado delas pisca —
+ * um céu inteiro piscando vira ruído e cansa quem fica o dia todo na tela.
+ */
+@keyframes cintilar {
+  0%,
+  100% {
+    opacity: var(--brilho-min);
+  }
+  50% {
+    opacity: var(--brilho-max);
+  }
+}
+
+.cintila {
+  animation: cintilar var(--periodo) ease-in-out infinite;
+  animation-delay: var(--atraso);
+}
+
+/* A Polaris não pisca: é a referência fixa. Ela respira. */
+@keyframes respirar {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+.respira {
+  animation: respirar 5.5s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Traço da constelação sendo desenhado, uma única vez, ao abrir. */
+@keyframes tracar {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.traca {
+  stroke-dasharray: 1;
+  animation: tracar 2.4s ease-out 0.2s both;
+}
+
+/* ─── Entradas ───────────────────────────────────────────────────────────── */
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.surge {
+  animation: surgir 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/*
+ * A barra de meta enche ao abrir a tela, em vez de já aparecer cheia. O alvo
+ * vem do próprio elemento (--alvo), porque cada barra para num lugar.
+ */
+@keyframes preencher {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--alvo);
+  }
+}
+
+.preenche {
+  animation: preencher 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── Acessibilidade ─────────────────────────────────────────────────────── */
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--royal-vivo);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
