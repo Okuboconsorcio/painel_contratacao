@@ -54,7 +54,7 @@ export default function CamposCandidato({ candidato }: { candidato?: Candidato }
       </div>
       <div>
         <label htmlFor="curriculo" className="rotulo-campo">
-          {c?.curriculo ? "Substituir currículo" : "Currículo"} (PDF, Word ou foto, até 10 MB)
+          {c?.curriculo ? "Substituir currículo" : "Currículo"} (PDF, Word ou foto, até 4 MB)
         </label>
         <input id="curriculo" name="curriculo" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" className="campo py-1.5" />
       </div>

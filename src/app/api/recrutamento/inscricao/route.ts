@@ -9,18 +9,18 @@ import { ErroRegra, inscrever } from "@/lib/recrutamento/processo";
  *        vaga (código da vaga), nome, email, telefone, cidade, bairro,
  *        data_nascimento, resumo, origem, consentimento=sim e o arquivo `curriculo`.
  *
- * Se a variável `RECRUTAMENTO_CHAVE_LP` existir, o pedido precisa do cabeçalho
- * `x-chave-lp` com o mesmo valor — sem isso, qualquer site poderia jogar
- * inscrição no banco. A chave não aparece em lugar nenhum do código.
- *
- * No Polaris, esta rota grava por uma função do banco com `security definer`
- * (a landing page não tem login), que só insere candidato e candidatura e não
- * devolve nada além de "ok".
+ * Quem chama é o servidor do site da MGCON (`www.mgconltda.com.br/vagas`), nunca
+ * o navegador do candidato. A inscrição exige o cabeçalho `x-chave-lp` igual a
+ * `RECRUTAMENTO_CHAVE_LP` — a mesma senha configurada nos dois projetos da
+ * Vercel. Na Vercel, sem a senha configurada, a inscrição fica fechada: sem
+ * isso, qualquer um poderia jogar inscrição no banco. No computador
+ * (protótipo), sem senha, aceita.
  */
 
 function autorizado(req: Request) {
   const chave = process.env.RECRUTAMENTO_CHAVE_LP;
-  return !chave || req.headers.get("x-chave-lp") === chave;
+  if (!chave) return !process.env.VERCEL;
+  return req.headers.get("x-chave-lp") === chave;
 }
 
 export async function GET() {

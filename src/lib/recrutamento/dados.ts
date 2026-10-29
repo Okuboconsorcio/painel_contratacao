@@ -91,12 +91,13 @@ const TIPOS_ACEITOS = [
   "image/png",
 ];
 
-export const TAMANHO_MAXIMO = 10 * 1024 * 1024;
+// A Vercel recusa envio acima de 4,5 MB antes de chegar ao código; 4 MB deixa folga.
+export const TAMANHO_MAXIMO = 4 * 1024 * 1024;
 
 /** Valida e guarda um arquivo enviado. Devolve `null` se não veio arquivo. */
 export async function salvarArquivo(arquivo: File | null): Promise<Arquivo | null> {
   if (!arquivo || arquivo.size === 0) return null;
-  if (arquivo.size > TAMANHO_MAXIMO) throw new ErroRegra("O arquivo passa de 10 MB.");
+  if (arquivo.size > TAMANHO_MAXIMO) throw new ErroRegra("O arquivo passa de 4 MB. Envie um PDF menor ou uma foto mais leve.");
   if (!TIPOS_ACEITOS.includes(arquivo.type)) {
     throw new ErroRegra("Envie PDF, Word, JPG ou PNG.");
   }
