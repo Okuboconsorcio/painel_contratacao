@@ -2,6 +2,18 @@
 
 O que mudou e **por quê**. O mais novo em cima.
 
+## 2026-10-29 (noite) — Landing page de vagas e senha da inscrição (Claude Code)
+
+- A landing page ficou **no site da MGCON** (`www.mgconltda.com.br/vagas`, repo
+  `Okuboconsorcio/Mgcon`), não aqui: o CSP do site só aceita script e fonte do
+  próprio domínio, e assim o candidato nunca vê o endereço do painel. O site lê
+  `GET /api/recrutamento/inscricao` e repassa a inscrição com `x-chave-lp`.
+- Na Vercel, a inscrição **exige** `RECRUTAMENTO_CHAVE_LP` (sem a variável, fica
+  fechada); no computador, sem senha, aceita.
+- Currículo até 4 MB: a Vercel recusa envio acima de 4,5 MB antes do código.
+- Publicado com aprovação do Nicolas (`main` `07c04b3`). Conferido: POST sem
+  senha ou com senha errada → 401.
+
 ## 2026-10-29 (noite) — Produção (Claude Code, aprovado pelo Nicolas)
 
 Nicolas testou a versão de teste ("entrei, funcionou") e aprovou: trava da
