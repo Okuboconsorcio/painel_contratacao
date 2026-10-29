@@ -53,6 +53,13 @@ compartilhado, Vercel própria).
   verdade, a tela mostraria dado velho. Agora `dynamic = "force-dynamic"` na
   moldura `(portal)/layout.tsx` e no login. Conferido com `VERCEL=1 npm run
   build` sem chaves: todas as telas `ƒ` (na hora).
+- **Pegadinha do Supabase:** schema novo exposto na API precisa de
+  `notify pgrst, 'reload schema'` além do `reload config` — sem isso a API diz
+  "Could not find the table … in the schema cache". Rodado em 29/10 depois das
+  migrações (não muda estrutura).
+- **Versão de teste com as chaves (29/10):** `/api/recrutamento/inscricao`
+  respondeu `{"vagas":[]}` lendo o banco de verdade; `/rh/recrutamento` sem
+  login cai no `/login`.
 - **Primeira publicação = produção** na Vercel (regra para projeto novo):
   cancelada antes de ficar pronta. Trava "Ignored Build Step" pula produção
   até o "aprovado".
