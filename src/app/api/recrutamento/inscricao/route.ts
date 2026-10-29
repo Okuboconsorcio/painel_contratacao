@@ -36,7 +36,8 @@ export async function GET() {
       horario: v.horario,
       atribuicoes: v.atribuicoes,
       requisitos: v.requisitos,
-      local: v.local,
+      diferenciais: v.diferenciais ?? "",
+      // Sem `local`: o endereço só é passado depois de marcar a entrevista.
     }));
   return Response.json({ vagas });
 }

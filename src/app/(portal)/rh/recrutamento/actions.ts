@@ -118,6 +118,7 @@ export async function salvarVagaAcao(_: Resultado | null, f: FormData): Promise<
           horario: txt(f, "horario"),
           atribuicoes: txt(f, "atribuicoes"),
           requisitos: txt(f, "requisitos"),
+          diferenciais: txt(f, "diferenciais"),
           local: txt(f, "local"),
           responsavel_nome: txt(f, "responsavel_nome"),
           responsavel_email: txt(f, "responsavel_email"),

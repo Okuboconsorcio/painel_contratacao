@@ -99,6 +99,7 @@ const vaga = salvarVaga(
     horario: "h",
     atribuicoes: "a",
     requisitos: "",
+    diferenciais: "",
     local: "",
     responsavel_nome: "Letícia",
     responsavel_email: "leticia@exemplo.com.br",

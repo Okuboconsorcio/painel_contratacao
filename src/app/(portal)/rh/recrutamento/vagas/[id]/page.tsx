@@ -173,6 +173,10 @@ export default async function VagaDetalhe({ params }: { params: Promise<{ id: st
               <dt className="rotulo-campo">Requisitos</dt>
               <dd className="whitespace-pre-line text-navy-900">{vaga.requisitos || "—"}</dd>
             </div>
+            <div className="sm:col-span-2">
+              <dt className="rotulo-campo">Conta ponto</dt>
+              <dd className="whitespace-pre-line text-navy-900">{vaga.diferenciais || "—"}</dd>
+            </div>
           </dl>
         </Secao>
         <Secao titulo="Landing page">

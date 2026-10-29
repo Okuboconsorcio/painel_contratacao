@@ -23,6 +23,7 @@ export default async function NovaVaga() {
             horario: "",
             atribuicoes: "",
             requisitos: "",
+            diferenciais: "",
             local: "",
             responsavel_nome: "Letícia Garcia",
             responsavel_email: "",

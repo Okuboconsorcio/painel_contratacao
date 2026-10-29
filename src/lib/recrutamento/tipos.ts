@@ -29,6 +29,9 @@ export type Vaga = {
   horario: string;
   atribuicoes: string;
   requisitos: string;
+  /** "Conta ponto": o que ajuda mas não é exigido (aparece na página de vagas). */
+  diferenciais: string;
+  /** Uso interno — não vai para a página pública (endereço só depois de marcar a entrevista). */
   local: string;
   /** Quem faz a triagem e recebe os lembretes de entrevista. */
   responsavel_nome: string;

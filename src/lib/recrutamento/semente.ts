@@ -167,7 +167,8 @@ export function criarSemente(agoraReal: Date): Banco {
     beneficios: "Vale-transporte, vale-refeição (exemplo)",
     horario: "Segunda a sexta, 8h às 17h (exemplo)",
     atribuicoes: "Ligações ativas pela discadora para leads de consórcio, apresentação das cartas e agendamento de vendas.",
-    requisitos: "Ensino médio completo. Experiência com telemarketing é diferencial.",
+    requisitos: "Boa comunicação\nProatividade\nFoco em resultados",
+    diferenciais: "Experiência em consórcio\nExperiência em telemarketing\nExperiência com vendas",
     local: "Presencial — escritório MGCON",
     responsavel_nome: LETICIA,
     responsavel_email: "leticia@exemplo.com.br",
@@ -365,6 +366,7 @@ export function criarSemente(agoraReal: Date): Banco {
       beneficios: "",
       atribuicoes: "Apoio ao pós-vendas e ao administrativo: conferência de documentos, arquivo e cadastro no Polaris.",
       requisitos: "Ensino médio completo; pacote Office.",
+      diferenciais: "",
     },
     "Nicolas Okubo",
     passo(0.97)

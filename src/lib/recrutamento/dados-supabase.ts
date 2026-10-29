@@ -61,6 +61,8 @@ function normalizar(colecao: Colecao, linha: Record<string, unknown>) {
     const v = linha[campo];
     if (typeof v === "string") linha[campo] = new Date(v).toISOString();
   }
+  // Coluna nova (29/10) aceita vazio no banco para a versão antiga do app não quebrar ao gravar.
+  if (colecao === "vagas" && linha.diferenciais == null) linha.diferenciais = "";
   return linha;
 }
 

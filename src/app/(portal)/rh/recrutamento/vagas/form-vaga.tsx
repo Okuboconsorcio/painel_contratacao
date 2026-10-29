@@ -50,8 +50,9 @@ export default function FormVaga({ vaga }: { vaga?: Vaga }) {
         {campo("beneficios", "Benefícios", { obrigatorio: true })}
         {campo("horario", "Horário de trabalho", { obrigatorio: true })}
         {campo("atribuicoes", "Atribuições e funções", { obrigatorio: true, textarea: true, span: true })}
-        {campo("requisitos", "Requisitos", { textarea: true, span: true })}
-        {campo("local", "Local de trabalho")}
+        {campo("requisitos", "Requisitos", { textarea: true, span: true, ajuda: "Um por linha. Aparece na página de vagas como lista." })}
+        {campo("diferenciais", "Conta ponto (diferenciais)", { textarea: true, span: true, ajuda: "O que ajuda, mas não é exigido. Um por linha. Ex.: experiência em consórcio." })}
+        {campo("local", "Local de trabalho", { ajuda: "Uso interno: não aparece na página de vagas." })}
         <div />
         {campo("responsavel_nome", "Responsável pela triagem", { ajuda: "Recebe o lembrete das entrevistas." })}
         {campo("responsavel_email", "E-mail da responsável", { tipo: "email" })}
