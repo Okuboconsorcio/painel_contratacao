@@ -105,6 +105,14 @@ export const FUNIL: Etapa[] = [
 
 export const ENCERRADAS: Etapa[] = ["REPROVADO", "DESISTIU", "RESERVA"];
 
+/**
+ * A página pública de vagas, no site da MGCON (repo `Okuboconsorcio/Mgcon`,
+ * rota /vagas). Só vaga ABERTA aparece lá; as outras dão "não encontrada".
+ */
+export const PAGINA_DE_VAGAS = "https://www.mgconltda.com.br/vagas";
+
+export const paginaDaVaga = (slug: string) => `${PAGINA_DE_VAGAS}/${slug}`;
+
 export const SITUACOES_VAGA: Record<SituacaoVaga, { rotulo: string; cor: CorBadge }> = {
   RASCUNHO: { rotulo: "Rascunho", cor: "neutro" },
   ABERTA: { rotulo: "Aberta", cor: "verde" },

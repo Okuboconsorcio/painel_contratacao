@@ -3,7 +3,8 @@ import CabecalhoPagina from "@/components/cabecalho-pagina";
 import { Etiqueta, Vazio } from "@/components/recrutamento/pecas";
 import { diaLongo } from "@/lib/recrutamento/datas";
 import { lerBanco } from "@/lib/recrutamento/dados";
-import { ETAPAS, SITUACOES_VAGA } from "@/lib/recrutamento/opcoes";
+import LinkDaVaga from "@/components/recrutamento/link-vaga";
+import { ETAPAS, paginaDaVaga, SITUACOES_VAGA } from "@/lib/recrutamento/opcoes";
 import { faltaParaAbrir } from "@/lib/recrutamento/regras";
 import { obterSessao } from "@/lib/recrutamento/sessao";
 import type { SituacaoVaga } from "@/lib/recrutamento/tipos";
@@ -55,9 +56,13 @@ export default async function Vagas() {
                 return (
                   <tr key={v.id} className="hover:bg-background">
                     <td className="px-4 py-3">
-                      <Link href={`${BASE}/vagas/${v.id}`} className="font-medium text-navy-900 hover:text-royal-vivo">
-                        {v.titulo}
-                      </Link>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <Link href={`${BASE}/vagas/${v.id}`} className="font-medium text-navy-900 hover:text-royal-vivo">
+                          {v.titulo}
+                        </Link>
+                        {/* Só vaga aberta está na página pública; as outras dariam "não encontrada". */}
+                        {v.situacao === "ABERTA" && <LinkDaVaga url={paginaDaVaga(v.slug)} compacto />}
+                      </div>
                       <p className="text-[0.75rem] text-tenue">
                         {v.empresa} · {v.quantidade} vaga(s)
                         {falta.length > 0 && <span className="text-amber-800"> · falta {falta.join(", ")}</span>}

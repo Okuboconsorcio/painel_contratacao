@@ -7,7 +7,8 @@ import { Etiqueta, Secao, Voltar } from "@/components/recrutamento/pecas";
 import { diasNaEtapa } from "@/lib/recrutamento/consultas";
 import { diaDe, diaLongo, hoje, momento, proximaSegunda } from "@/lib/recrutamento/datas";
 import { lerBanco } from "@/lib/recrutamento/dados";
-import { ENCERRADAS, ETAPAS, FUNIL, SITUACOES_VAGA } from "@/lib/recrutamento/opcoes";
+import LinkDaVaga from "@/components/recrutamento/link-vaga";
+import { ENCERRADAS, ETAPAS, FUNIL, paginaDaVaga, SITUACOES_VAGA } from "@/lib/recrutamento/opcoes";
 import { faltaParaAbrir } from "@/lib/recrutamento/regras";
 import { obterSessao } from "@/lib/recrutamento/sessao";
 import { situacaoVagaAcao } from "../../actions";
@@ -179,19 +180,22 @@ export default async function VagaDetalhe({ params }: { params: Promise<{ id: st
             </div>
           </dl>
         </Secao>
-        <Secao titulo="Landing page">
-          <p className="text-[0.8rem] text-tenue">
-            O formulário da landing page manda as inscrições para o endereço abaixo, com o código da vaga. A landing page
-            em si é outro projeto (subdomínio da MGCON, fora do site).
-          </p>
-          <p className="mt-2 text-[0.75rem] text-tenue">Código da vaga</p>
-          <code className="mt-0.5 block break-all rounded-md bg-background px-2 py-1.5 text-[0.75rem] text-navy-900">{vaga.slug}</code>
-          <p className="mt-2 text-[0.75rem] text-tenue">Endereço para envio</p>
-          <code className="mt-0.5 block break-all rounded-md bg-background px-2 py-1.5 text-[0.75rem] text-navy-900">
-            POST /api/recrutamento/inscricao
-          </code>
-          <p className="mt-2 text-[0.72rem] text-tenue">
-            Situação para a landing page: {vaga.situacao === "ABERTA" ? "recebendo inscrições" : "não recebe inscrições"}.
+        <Secao titulo="Página da vaga">
+          {vaga.situacao === "ABERTA" ? (
+            <>
+              <p className="text-[0.8rem] text-tenue">
+                Link para divulgar (anúncio, Instagram, WhatsApp). As inscrições chegam aqui como &ldquo;Inscrito&rdquo;.
+              </p>
+              <div className="mt-2">
+                <LinkDaVaga url={paginaDaVaga(vaga.slug)} />
+              </div>
+            </>
+          ) : (
+            <p className="text-[0.8rem] text-tenue">
+              Só vaga aberta aparece na página de vagas do site da MGCON. Abra a vaga para ter o link de divulgação.
+            </p>
+          )}
+          <p className="mt-3 text-[0.72rem] text-tenue">
             Criada em {diaLongo(diaDe(vaga.criado_em))} por {vaga.criado_por}.
           </p>
         </Secao>
