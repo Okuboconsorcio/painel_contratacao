@@ -1,4 +1,6 @@
+import { after } from "next/server";
 import { comArquivo, transacao, lerBanco } from "@/lib/recrutamento/dados";
+import { enviarPendentes } from "@/lib/recrutamento/envio";
 import { ErroRegra, inscrever } from "@/lib/recrutamento/processo";
 
 /**
@@ -81,6 +83,15 @@ export async function POST(req: Request) {
         )
       )
     );
+    // O "recebemos sua candidatura" sai na hora, depois da resposta ao site —
+    // sem isso, só sairia quando alguém abrisse o painel ou no agendador das 9h.
+    after(async () => {
+      try {
+        await enviarPendentes();
+      } catch {
+        // fica na fila e sai na próxima vez
+      }
+    });
     // Resposta mínima: a landing page não precisa (nem deve) saber se a pessoa já existia no banco.
     return Response.json({ ok: true });
   } catch (e) {

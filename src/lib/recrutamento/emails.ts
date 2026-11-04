@@ -50,7 +50,6 @@ export function montarEmail(
           `Olá, ${nome}!`,
           `Recebemos sua candidatura para a vaga de ${vaga.titulo} na ${empresa}. Obrigado pelo interesse.`,
           "Nossa equipe vai analisar seu currículo nos próximos dias. Se o seu perfil seguir no processo, entraremos em contato pelo telefone ou WhatsApp que você informou para marcar uma entrevista.",
-          "Você recebe uma resposta por e-mail de qualquer forma. Até lá, é só aguardar.",
         ],
       };
 

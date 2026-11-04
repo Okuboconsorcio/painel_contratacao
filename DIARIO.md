@@ -2,6 +2,20 @@
 
 O que mudou e **por quê**. O mais novo em cima.
 
+## 2026-11-04 (tarde) — "Recebemos sua candidatura" ligado e saindo na hora (Claude Code)
+
+O Nicolas se inscreveu como teste e não recebeu e-mail: a confirmação estava
+desligada de propósito (decisão de 29/10). Ele pediu para ligar ("Sim, ligar").
+
+- **Banco:** `CONFIRMACAO_CANDIDATURA` incluído em `config.emails_ligados`.
+- **Na hora:** a rota `/api/recrutamento/inscricao` só gravava; o e-mail ficava
+  na fila até alguém abrir o painel ou o agendador das 9h. Agora chama
+  `enviarPendentes()` em `after()` — depois de responder ao site, sem atrasar a
+  inscrição; se falhar, fica na fila.
+- **Texto:** saiu "Você recebe uma resposta por e-mail de qualquer forma" — o
+  retorno de aprovação/negativa é manual (e-mails desligados), não é promessa
+  que o painel cumpre.
+
 ## 2026-11-04 — Revisão antes de divulgar: arquivo sem dono, e-mail vencido, exclusão LGPD (Claude Code)
 
 Revisão pedida pelo Nicolas ("posso publicar as vagas? está tudo certo?"). Achados e correções:
