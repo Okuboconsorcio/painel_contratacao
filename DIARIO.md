@@ -17,7 +17,7 @@ utm_campaign, utm_content e fbclid, e o painel guarda na candidatura.
   de publicar este painel** — e publicar logo depois: o `aplicar` regrava a linha
   inteira, então a versão antiga apagaria o rastreio ao mexer na candidatura.
 - `regras:conferir` 63/63; testado ponta a ponta com o site local gravando as UTMs.
-- **Não publicado:** espera o "aprovado" do Nicolas, junto com o site.
+- **Publicado** (aprovado: "Sim, aprovado"): migração aplicada e, em seguida, `main` `39661f4`.
 
 ## 2026-11-04 (tarde) — "Recebemos sua candidatura" ligado e saindo na hora (Claude Code)
 
