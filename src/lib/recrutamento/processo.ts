@@ -39,6 +39,7 @@ import type {
   Candidato,
   Candidatura,
   Etapa,
+  Rastreio,
   ResultadoContato,
   Vaga,
 } from "./tipos.ts";
@@ -151,7 +152,8 @@ export function inscrever(
   vagaId: string,
   curriculo: Arquivo | null,
   quem: string | null,
-  agora: Date
+  agora: Date,
+  rastreio: Rastreio | null = null
 ): { candidato: Candidato; candidatura: Candidatura; jaExistia: boolean } {
   validarCandidato(dados);
   const vaga = banco.vagas.find((v) => v.id === vagaId);
@@ -213,6 +215,7 @@ export function inscrever(
     decisao: null,
     data_inicio: null,
     confirmado_em: null,
+    rastreio,
     criado_em: iso,
     atualizado_em: iso,
   };

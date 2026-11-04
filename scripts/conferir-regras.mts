@@ -25,6 +25,7 @@ import {
   salvarVaga,
 } from "../src/lib/recrutamento/processo.ts";
 import { MODELOS_EMAIL } from "../src/lib/recrutamento/opcoes.ts";
+import { limparValorRastreio, montarRastreio } from "../src/lib/recrutamento/rastreio.ts";
 import { pode } from "../src/lib/recrutamento/permissoes.ts";
 import { avisosInicio, emailVencido, fasesDoCiclo, faltaParaAbrir, guardarAte, quandoEnviarLembrete, quandoEnviarNegativa, sugestaoInicio, validarDataInicio } from "../src/lib/recrutamento/regras.ts";
 import { criarSemente } from "../src/lib/recrutamento/semente.ts";
@@ -168,6 +169,16 @@ lanca("início no sábado é recusado", () => confirmarInicio(banco, c.id, "2026
 confirmarInicio(banco, c.id, "2026-11-09", "Letícia", t("2026-11-04", "09:00"));
 confere("termina em admissão", c.etapa === "ADMISSAO" && c.data_inicio === "2026-11-09");
 confere("histórico completo", banco.eventos.filter((e) => e.candidatura_id === c.id).length >= 8);
+
+console.log("De qual anúncio veio");
+confere("prévia do anúncio ({{…}}) vira vazio", limparValorRastreio("{{campaign.name}}") === "" && limparValorRastreio(" vagas-nov ") === "vagas-nov");
+confere("sem UTM nenhuma não guarda nada", montarRastreio(() => "") === null);
+{
+  const r = montarRastreio((k) => ({ utm_source: "facebook", utm_campaign: "{{campaign.name}}", fbclid: "abc" } as Record<string, string>)[k]);
+  confere("guarda o que veio, sem o literal", r?.utm_source === "facebook" && r.utm_campaign === "" && r.fbclid === "abc");
+  const { candidatura: cr } = inscrever(structuredClone(banco), { ...dados, nome: "Rita Anúncio", email: "rita@exemplo.com.br", telefone: "11977776666" }, vaga.id, null, null, t("2026-10-27", "10:00"), r);
+  confere("candidatura grava o rastreio", cr.rastreio?.utm_source === "facebook");
+}
 
 console.log("E-mail desligado");
 banco.config.emails_ligados = ["ENTREVISTA_AGENDADA"];

@@ -157,8 +157,19 @@ export type Candidatura = {
   /** Segunda-feira em que começa, quando confirmou. */
   data_inicio: string | null;
   confirmado_em: string | null;
+  /** De qual anúncio veio (UTMs e fbclid da página de vagas). `null` no cadastro manual. */
+  rastreio?: Rastreio | null;
   criado_em: string;
   atualizado_em: string;
+};
+
+/** UTMs e fbclid que a página de vagas manda junto com a inscrição. */
+export type Rastreio = {
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_content: string;
+  fbclid: string;
 };
 
 export type CanalContato = "WHATSAPP" | "LIGACAO" | "EMAIL";

@@ -63,6 +63,8 @@ function normalizar(colecao: Colecao, linha: Record<string, unknown>) {
   }
   // Coluna nova (29/10) aceita vazio no banco para a versão antiga do app não quebrar ao gravar.
   if (colecao === "vagas" && linha.diferenciais == null) linha.diferenciais = "";
+  // Coluna nova (04/11): candidatura sem anúncio (cadastro manual, ou antes do pixel) fica `null`.
+  if (colecao === "candidaturas" && linha.rastreio === undefined) linha.rastreio = null;
   return linha;
 }
 

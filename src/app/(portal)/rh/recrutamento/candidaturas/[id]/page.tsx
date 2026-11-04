@@ -423,6 +423,19 @@ export default async function Candidatura({
                   {[pessoa.bairro, pessoa.cidade].filter(Boolean).join(", ") || "—"} · {pessoa.origem}
                 </dd>
               </div>
+              {c.rastreio && (
+                <div>
+                  <dt className="rotulo-campo">Anúncio (de onde veio)</dt>
+                  <dd className="space-y-0.5 text-[0.8rem] text-navy-900">
+                    {c.rastreio.utm_campaign && <p>Campanha: {c.rastreio.utm_campaign}</p>}
+                    {c.rastreio.utm_content && <p>Anúncio: {c.rastreio.utm_content}</p>}
+                    {(c.rastreio.utm_source || c.rastreio.utm_medium) && (
+                      <p className="text-tenue">{[c.rastreio.utm_source, c.rastreio.utm_medium].filter(Boolean).join(" / ")}</p>
+                    )}
+                    {c.rastreio.fbclid && !c.rastreio.utm_campaign && <p className="text-tenue">Clique da Meta (sem UTM)</p>}
+                  </dd>
+                </div>
+              )}
               <div>
                 <dt className="rotulo-campo">Experiência</dt>
                 <dd className="text-navy-900">{pessoa.resumo || "—"}</dd>

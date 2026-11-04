@@ -2,6 +2,7 @@ import { after } from "next/server";
 import { comArquivo, transacao, lerBanco } from "@/lib/recrutamento/dados";
 import { enviarPendentes } from "@/lib/recrutamento/envio";
 import { ErroRegra, inscrever } from "@/lib/recrutamento/processo";
+import { montarRastreio } from "@/lib/recrutamento/rastreio";
 
 /**
  * Porta de entrada da landing page de vagas.
@@ -9,7 +10,9 @@ import { ErroRegra, inscrever } from "@/lib/recrutamento/processo";
  * GET  → vagas abertas (para a página listar), sem nenhum dado interno.
  * POST → inscrição: formulário `multipart/form-data` com
  *        vaga (código da vaga), nome, email, telefone, cidade, bairro,
- *        data_nascimento, resumo, origem, consentimento=sim e o arquivo `curriculo`.
+ *        data_nascimento, resumo, origem, consentimento=sim e o arquivo `curriculo`;
+ *        opcionais: utm_source, utm_medium, utm_campaign, utm_content e fbclid
+ *        (de qual anúncio veio — ver `rastreio.ts`).
  *
  * Quem chama é o servidor do site da MGCON (`www.mgconltda.com.br/vagas`), nunca
  * o navegador do candidato. A inscrição exige o cabeçalho `x-chave-lp` igual a
@@ -79,7 +82,8 @@ export async function POST(req: Request) {
           vaga.id,
           curriculo,
           null,
-          new Date()
+          new Date(),
+          montarRastreio((c) => form.get(c))
         )
       )
     );
