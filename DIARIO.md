@@ -2,6 +2,28 @@
 
 O que mudou e **por quê**. O mais novo em cima.
 
+## 2026-11-04 — Revisão antes de divulgar: arquivo sem dono, e-mail vencido, exclusão LGPD (Claude Code)
+
+Revisão pedida pelo Nicolas ("posso publicar as vagas? está tudo certo?"). Achados e correções:
+
+- **Arquivo sem dono:** o currículo era guardado antes de gravar a inscrição; se
+  ela fosse recusada (mesma pessoa de novo, vaga fechada), o arquivo ficava no
+  bucket sem dono — dado pessoal que a limpeza LGPD não via. Já havia 2 assim.
+  Agora `comArquivo()` (dados.ts) apaga o arquivo se o passo falhar, nos 4
+  lugares que recebem arquivo; e o agendador diário apaga os que estiverem sem
+  dono há mais de 1 h (`limparArquivosSemDono`).
+- **E-mail vencido:** sem a senha do SMTP nada sai, e a fila acumula. Quando a
+  senha entrasse, sairia tudo atrasado ("sua entrevista está marcada" uma
+  semana depois). Agora e-mail com mais de 2 dias de atraso é cancelado com o
+  motivo (`DIAS_VALIDADE_EMAIL`), no protótipo e no Supabase.
+- **Excluir dados (LGPD):** a página de vagas promete "posso pedir a exclusão
+  a qualquer momento" e não havia como. Botão na ficha do candidato, só para
+  quem tem `recrutamento/excluir` (master); mesmo efeito da limpeza por prazo.
+- **Banco de produção:** as 3 inscrições de teste (Nicolas, "Teste snsn",
+  "gui silva") apagadas por id exato, com aprovação do Nicolas.
+- `regras:conferir` 59/59; teste do `comArquivo` (apaga na falha, mantém no
+  sucesso); botão testado no navegador em modo produção local.
+
 ## 2026-10-29 (noite) — Landing page de vagas e senha da inscrição (Claude Code)
 
 - A landing page ficou **no site da MGCON** (`www.mgconltda.com.br/vagas`, repo

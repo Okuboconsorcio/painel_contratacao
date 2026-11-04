@@ -1,9 +1,9 @@
-import { enviarPendentes, limparVencidos } from "@/lib/recrutamento/envio";
+import { enviarPendentes, limparArquivosSemDono, limparVencidos } from "@/lib/recrutamento/envio";
 
 /**
  * Agendador da Vercel (`vercel.json`): uma vez por dia, perto das 9h, manda os
- * lembretes de entrevista e apaga quem passou do prazo de guarda (LGPD), mesmo
- * que ninguém abra o painel. A Vercel manda `Authorization: Bearer <CRON_SECRET>`;
+ * lembretes de entrevista, apaga quem passou do prazo de guarda (LGPD) e os
+ * arquivos que ficaram sem dono, mesmo que ninguém abra o painel. A Vercel manda `Authorization: Bearer <CRON_SECRET>`;
  * sem a variável configurada, a rota não faz nada.
  */
 export async function GET(req: Request) {
@@ -14,5 +14,6 @@ export async function GET(req: Request) {
   const agora = new Date();
   const enviados = await enviarPendentes(agora);
   const apagados = await limparVencidos(agora);
-  return Response.json({ ok: true, enviados, apagados });
+  const arquivos = await limparArquivosSemDono(agora);
+  return Response.json({ ok: true, enviados, apagados, arquivos });
 }

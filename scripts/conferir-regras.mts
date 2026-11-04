@@ -12,6 +12,7 @@ import { ehSegunda, juntarDiaHora, somarDias, diaDe } from "../src/lib/recrutame
 import { processarFila } from "../src/lib/recrutamento/emails.ts";
 import {
   apagarVencidos,
+  excluirCandidato,
   confirmarInicio,
   decidir,
   desfazerEncerramento,
@@ -25,7 +26,7 @@ import {
 } from "../src/lib/recrutamento/processo.ts";
 import { MODELOS_EMAIL } from "../src/lib/recrutamento/opcoes.ts";
 import { pode } from "../src/lib/recrutamento/permissoes.ts";
-import { avisosInicio, fasesDoCiclo, faltaParaAbrir, guardarAte, quandoEnviarLembrete, quandoEnviarNegativa, sugestaoInicio, validarDataInicio } from "../src/lib/recrutamento/regras.ts";
+import { avisosInicio, emailVencido, fasesDoCiclo, faltaParaAbrir, guardarAte, quandoEnviarLembrete, quandoEnviarNegativa, sugestaoInicio, validarDataInicio } from "../src/lib/recrutamento/regras.ts";
 import { criarSemente } from "../src/lib/recrutamento/semente.ts";
 import type { Banco, ModeloEmail } from "../src/lib/recrutamento/tipos.ts";
 
@@ -191,7 +192,28 @@ confere("só o aceite conta quando não há candidatura", guardarAte("2026-10-29
 }
 confere("contratado não vence", guardarAte("2025-01-01T12:00:00Z", [{ etapa: "ADMISSAO", atualizado_em: "2025-02-01T12:00:00Z" }], 12) === null);
 
+console.log("Exclusão a pedido e e-mail vencido");
+{
+  const b = structuredClone(banco);
+  const alvo = b.candidatos.find((x) => x.email === "bruno@exemplo.com.br")!;
+  const antes = b.candidatos.length;
+  excluirCandidato(b, alvo.id, t("2026-11-01", "09:00"));
+  confere("exclusão a pedido apaga a pessoa e o histórico", b.candidatos.length === antes - 1 && !b.eventos.some((e) => e.candidato_id === alvo.id));
+  confere("exclusão a pedido fica só na contagem", b.limpezas_lgpd.at(-1)?.candidatos === 1);
+  lanca("exclusão de quem não existe", () => excluirCandidato(b, "cand_nao_existe", t("2026-11-01", "09:00")), "não encontrado");
+
+  const c = structuredClone(banco);
+  const e = c.emails[0];
+  e.situacao = "PENDENTE";
+  e.agendado_para = t("2026-10-20", "09:00").toISOString();
+  processarFila(c, t("2026-10-30", "09:00"));
+  // `as string`: o TypeScript acha que continua "PENDENTE" (não vê processarFila mudar o objeto).
+  confere("e-mail com mais de 2 dias de atraso é cancelado, não enviado", (e.situacao as string) === "CANCELADO" && e.motivo.includes("não saiu a tempo"));
+  confere("e-mail dentro do prazo ainda sai", !emailVencido(t("2026-10-29", "09:00").toISOString(), t("2026-10-30", "09:00")));
+}
+
 console.log("Permissões");
+confere("só master exclui dados", pode("master", "recrutamento", "excluir") && !pode("suporte_administrativo", "recrutamento", "excluir"));
 confere("Letícia registra a decisão", pode("suporte_administrativo", "recrutamento_decidir", "criar"));
 confere("Marco registra a decisão", pode("gestor_rh", "recrutamento_decidir", "criar"));
 confere("vendedor não registra", !pode("vendedor", "recrutamento_decidir", "criar"));

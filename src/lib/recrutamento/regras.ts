@@ -168,6 +168,19 @@ export function quandoEnviarNegativa(agora: Date, dias: number): string {
 }
 
 /**
+ * E-mail que não saiu até 2 dias depois da hora marcada não sai mais: "sua
+ * entrevista está marcada" uma semana depois só confunde. Acontece quando o
+ * envio ficou desligado (sem senha do e-mail no servidor) e é ligado depois.
+ */
+export const DIAS_VALIDADE_EMAIL = 2;
+
+export function emailVencido(agendadoPara: string, agora: Date): boolean {
+  return Date.parse(agendadoPara) < agora.getTime() - DIAS_VALIDADE_EMAIL * 86_400_000;
+}
+
+export const MOTIVO_EMAIL_VENCIDO = `não saiu a tempo (mais de ${DIAS_VALIDADE_EMAIL} dias de atraso) — cancelado`;
+
+/**
  * Lembrete: na véspera da entrevista, no horário configurado. Se a entrevista
  * foi marcada tão em cima que a véspera já passou, vai na hora.
  */

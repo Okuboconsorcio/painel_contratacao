@@ -17,7 +17,7 @@
 
 import { momento, nomeDoDia, diaDe } from "./datas.ts";
 import { MODELOS_EMAIL } from "./opcoes.ts";
-import { quandoEnviarLembrete, quandoEnviarNegativa } from "./regras.ts";
+import { emailVencido, MOTIVO_EMAIL_VENCIDO, quandoEnviarLembrete, quandoEnviarNegativa } from "./regras.ts";
 import type { Banco, Candidato, Candidatura, Email, ModeloEmail, Vaga } from "./tipos.ts";
 
 function primeiroNome(nome: string) {
@@ -228,6 +228,11 @@ export function processarFila(banco: Banco, agora: Date): number {
   let n = 0;
   for (const e of banco.emails) {
     if (e.situacao !== "PENDENTE" || e.agendado_para > limite) continue;
+    if (emailVencido(e.agendado_para, agora)) {
+      e.situacao = "CANCELADO";
+      e.motivo = MOTIVO_EMAIL_VENCIDO;
+      continue;
+    }
     if (!e.para.length) {
       e.situacao = "FALHOU";
       e.motivo = "sem destinatário com e-mail";

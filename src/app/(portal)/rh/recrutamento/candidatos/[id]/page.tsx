@@ -10,7 +10,7 @@ import { guardarAte } from "@/lib/recrutamento/regras";
 import { lerBanco } from "@/lib/recrutamento/dados";
 import { ETAPAS } from "@/lib/recrutamento/opcoes";
 import { obterSessao } from "@/lib/recrutamento/sessao";
-import { editarCandidatoAcao, inscreverEmVagaAcao } from "../../actions";
+import { editarCandidatoAcao, excluirCandidatoAcao, inscreverEmVagaAcao } from "../../actions";
 import CamposCandidato from "../campos-candidato";
 
 const BASE = "/rh/recrutamento";
@@ -131,6 +131,24 @@ export default async function FichaCandidato({ params }: { params: Promise<{ id:
             </div>
           </dl>
         </Secao>
+
+        {sessao.pode("recrutamento", "excluir") && (
+          <Secao titulo="Excluir dados (LGPD)">
+            <p className="text-[0.8rem] text-tenue">
+              Para quando a pessoa pede para apagar os dados. Some tudo dela: ficha, currículo, candidaturas, contatos,
+              fichas de entrevista, histórico e e-mails. Não dá para desfazer.
+            </p>
+            <FormularioAcao
+              acao={excluirCandidatoAcao}
+              botao="Excluir dados desta pessoa"
+              variante="perigo"
+              confirmar={`Apagar todos os dados de ${pessoa.nome}? Não dá para desfazer.`}
+              className="mt-3"
+            >
+              <input type="hidden" name="candidato_id" value={pessoa.id} />
+            </FormularioAcao>
+          </Secao>
+        )}
       </div>
     </div>
   );

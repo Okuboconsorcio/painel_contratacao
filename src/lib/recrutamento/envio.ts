@@ -15,9 +15,10 @@
  */
 
 import nodemailer from "nodemailer";
-import { apagarArquivos, lerBanco, modoSupabase, transacao } from "./dados.ts";
+import { apagarArquivos, arquivosSemDono, lerBanco, modoSupabase, transacao } from "./dados.ts";
 import { clienteServico } from "./dados-supabase.ts";
 import { processarFila } from "./emails.ts";
+import { DIAS_VALIDADE_EMAIL, MOTIVO_EMAIL_VENCIDO } from "./regras.ts";
 import { apagarVencidos, candidatosVencidos } from "./processo.ts";
 import type { Email } from "./tipos.ts";
 
@@ -59,9 +60,15 @@ export async function enviarPendentes(agora = new Date()): Promise<number> {
     if (!(await lerBanco()).emails.some((e) => e.situacao === "PENDENTE" && e.agendado_para <= limite)) return 0;
     return transacao((b) => processarFila(b, agora));
   }
+  const banco = clienteServico();
+  // Antes de tudo (com ou sem senha do e-mail): o que passou da validade não sai mais.
+  await banco
+    .from("email")
+    .update({ situacao: "CANCELADO", motivo: MOTIVO_EMAIL_VENCIDO })
+    .eq("situacao", "PENDENTE")
+    .lt("agendado_para", new Date(agora.getTime() - DIAS_VALIDADE_EMAIL * 86_400_000).toISOString());
   if (!smtp()) return 0;
 
-  const banco = clienteServico();
   const { data: reservados, error } = await banco.rpc("reservar_emails");
   if (error || !reservados?.length) return 0;
   const { data: cfg } = await banco.from("config").select("dados").single();
@@ -88,6 +95,13 @@ export async function limparVencidos(agora = new Date()): Promise<number> {
   });
   await apagarArquivos(arquivos.map((a) => a.id));
   return quantos;
+}
+
+/** Apaga arquivos guardados que não pertencem a ninguém (ver `arquivosSemDono`). Devolve quantos. */
+export async function limparArquivosSemDono(agora = new Date()): Promise<number> {
+  const ids = await arquivosSemDono(await lerBanco(), agora);
+  await apagarArquivos(ids);
+  return ids.length;
 }
 
 /** O "agendador": e-mails na hora e limpeza LGPD. Nunca lança erro. */

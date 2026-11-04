@@ -12,7 +12,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { juntarDiaHora } from "@/lib/recrutamento/datas";
-import { lerBanco, salvarArquivo, transacao } from "@/lib/recrutamento/dados";
+import { apagarArquivos, comArquivo, lerBanco, transacao } from "@/lib/recrutamento/dados";
 import { enviarPendentes } from "@/lib/recrutamento/envio";
 import { CRITERIOS_ENTREVISTA, CRITERIOS_TRIAGEM, DADOS_FICHA, MODELOS_EMAIL } from "@/lib/recrutamento/opcoes";
 import type { AcaoPermissao, Modulo, Papel } from "@/lib/recrutamento/permissoes";
@@ -23,6 +23,7 @@ import {
   desfazerEncerramento,
   desistir,
   editarCandidato,
+  excluirCandidato,
   ErroRegra,
   inscrever,
   mudarSituacaoVaga,
@@ -149,9 +150,8 @@ export async function situacaoVagaAcao(_: Resultado | null, f: FormData): Promis
 export async function novoCandidatoAcao(_: Resultado | null, f: FormData): Promise<Resultado> {
   let destino = "";
   const r = await executar("recrutamento", "criar", async (s, agora) => {
-    const curriculo = await salvarArquivo(arquivo(f, "curriculo"));
-    const { candidatura } = await transacao((b) =>
-      inscrever(b, dadosCandidato(f), txt(f, "vaga_id"), curriculo, s.nome, agora)
+    const { candidatura } = await comArquivo(arquivo(f, "curriculo"), (curriculo) =>
+      transacao((b) => inscrever(b, dadosCandidato(f), txt(f, "vaga_id"), curriculo, s.nome, agora))
     );
     destino = `${BASE}/candidaturas/${candidatura.id}`;
   });
@@ -164,11 +164,26 @@ export async function editarCandidatoAcao(_: Resultado | null, f: FormData): Pro
     "recrutamento",
     "editar",
     async (s, agora) => {
-      const curriculo = await salvarArquivo(arquivo(f, "curriculo"));
-      await transacao((b) => editarCandidato(b, txt(f, "candidato_id"), dadosCandidato(f), curriculo, s.nome, agora));
+      await comArquivo(arquivo(f, "curriculo"), (curriculo) =>
+        transacao((b) => editarCandidato(b, txt(f, "candidato_id"), dadosCandidato(f), curriculo, s.nome, agora))
+      );
     },
     "Ficha salva."
   );
+}
+
+/**
+ * LGPD: apaga a pessoa e tudo dela, a pedido (a página de vagas promete "posso
+ * pedir a exclusão a qualquer momento"). Só quem pode excluir (master). Grava o
+ * banco primeiro e depois apaga os arquivos, como a limpeza por prazo.
+ */
+export async function excluirCandidatoAcao(_: Resultado | null, f: FormData): Promise<Resultado> {
+  const r = await executar("recrutamento", "excluir", async (_s, agora) => {
+    const arquivos = await transacao((b) => excluirCandidato(b, txt(f, "candidato_id"), agora));
+    await apagarArquivos(arquivos.map((a) => a.id));
+  });
+  if (r.ok) redirect(`${BASE}/candidatos`);
+  return r;
 }
 
 /** Reaproveita alguém do banco de currículos numa vaga nova. */
@@ -265,37 +280,38 @@ export async function avaliacaoAcao(_: Resultado | null, f: FormData): Promise<R
     "recrutamento",
     "editar",
     async (s, agora) => {
-      const ficha = await salvarArquivo(arquivo(f, "ficha"));
       const sup = num(f, "nota_supervisora");
       const tres = (prefixo: string) => [1, 2, 3].map((i) => txt(f, `${prefixo}_${i}`));
       // "Outro, quem?" do papel: entra na lista junto com os marcados.
       const realizadaPor = [...f.getAll("realizada_por").map(String), txt(f, "realizada_outro")].filter(Boolean);
       const supervisora = txt(f, "supervisora") === "OUTRA" ? txt(f, "supervisora_outra") : txt(f, "supervisora");
-      await transacao((b) =>
-        registrarAvaliacao(
-          b,
-          txt(f, "candidatura_id"),
-          {
-            dados: Object.fromEntries(
-              DADOS_FICHA.map((d) => [d.chave, { valor: txt(f, `dado_${d.chave}`), detalhe: txt(f, `dado_${d.chave}_detalhe`) }])
-            ),
-            notas: Object.fromEntries(
-              CRITERIOS_ENTREVISTA.map((k) => [
-                k.chave,
-                { nota: num(f, `nota_${k.chave}`), justificativa: txt(f, `just_${k.chave}`) },
-              ])
-            ),
-            pontos_positivos: tres("positivo"),
-            pontos_atencao: tres("atencao"),
-            realizada_por: realizadaPor,
-            supervisora,
-            nota_entrevistador: num(f, "nota_entrevistador"),
-            nota_supervisora: Number.isNaN(sup) ? null : sup,
-            parecer: txt(f, "parecer") as "APROVADO" | "REPROVADO" | "RESERVA",
-            ficha,
-          },
-          s.nome,
-          agora
+      await comArquivo(arquivo(f, "ficha"), (ficha) =>
+        transacao((b) =>
+          registrarAvaliacao(
+            b,
+            txt(f, "candidatura_id"),
+            {
+              dados: Object.fromEntries(
+                DADOS_FICHA.map((d) => [d.chave, { valor: txt(f, `dado_${d.chave}`), detalhe: txt(f, `dado_${d.chave}_detalhe`) }])
+              ),
+              notas: Object.fromEntries(
+                CRITERIOS_ENTREVISTA.map((k) => [
+                  k.chave,
+                  { nota: num(f, `nota_${k.chave}`), justificativa: txt(f, `just_${k.chave}`) },
+                ])
+              ),
+              pontos_positivos: tres("positivo"),
+              pontos_atencao: tres("atencao"),
+              realizada_por: realizadaPor,
+              supervisora,
+              nota_entrevistador: num(f, "nota_entrevistador"),
+              nota_supervisora: Number.isNaN(sup) ? null : sup,
+              parecer: txt(f, "parecer") as "APROVADO" | "REPROVADO" | "RESERVA",
+              ficha,
+            },
+            s.nome,
+            agora
+          )
         )
       );
     },

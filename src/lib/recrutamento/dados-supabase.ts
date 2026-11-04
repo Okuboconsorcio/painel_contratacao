@@ -138,6 +138,23 @@ export async function lerArquivo(id: string): Promise<{ nome: string; conteudo: 
   return { nome, conteudo: Buffer.from(await data.arrayBuffer()) };
 }
 
+/** Todo arquivo do bucket: `<id>/<nome>`, com a data de envio. */
+export async function listarArquivos(): Promise<{ id: string; criado: number }[]> {
+  const pastas: string[] = [];
+  for (let de = 0; ; de += 1000) {
+    const { data, error } = await banco().storage.from(BUCKET).list("", { limit: 1000, offset: de, sortBy: { column: "name", order: "asc" } });
+    if (error) throw new Error(`Erro ao listar arquivos: ${error.message}`);
+    pastas.push(...(data ?? []).map((p) => p.name));
+    if (!data || data.length < 1000) break;
+  }
+  const arquivos: { id: string; criado: number }[] = [];
+  for (const id of pastas) {
+    const { data } = await banco().storage.from(BUCKET).list(id, { limit: 10 });
+    for (const a of data ?? []) arquivos.push({ id, criado: new Date(a.created_at ?? 0).getTime() });
+  }
+  return arquivos;
+}
+
 export async function apagarArquivos(ids: string[]) {
   const caminhos: string[] = [];
   for (const id of ids) {

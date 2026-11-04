@@ -688,7 +688,20 @@ export function candidatosVencidos(banco: Banco, agora: Date): Set<string> {
  * escaneadas) para quem chamou apagar depois de gravar o banco.
  */
 export function apagarVencidos(banco: Banco, agora: Date): Arquivo[] {
-  const vencidos = candidatosVencidos(banco, agora);
+  return apagarPessoas(banco, candidatosVencidos(banco, agora), agora);
+}
+
+/**
+ * LGPD, a pedido: a pessoa pediu para apagar os dados (o aceite da página de
+ * vagas promete "posso pedir a exclusão a qualquer momento"). Mesmo efeito da
+ * limpeza por prazo — some tudo, fica só a contagem, sem nome.
+ */
+export function excluirCandidato(banco: Banco, candidatoId: string, agora: Date): Arquivo[] {
+  if (!banco.candidatos.some((p) => p.id === candidatoId)) throw new ErroRegra("Candidato não encontrado.");
+  return apagarPessoas(banco, new Set([candidatoId]), agora);
+}
+
+function apagarPessoas(banco: Banco, vencidos: Set<string>, agora: Date): Arquivo[] {
   if (vencidos.size === 0) return [];
 
   const arquivos: Arquivo[] = [];

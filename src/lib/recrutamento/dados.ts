@@ -113,6 +113,41 @@ export async function salvarArquivo(arquivo: File | null): Promise<Arquivo | nul
   return { id, nome, tipo: arquivo.type, tamanho: arquivo.size };
 }
 
+/**
+ * Guarda o arquivo e só o mantém se o passo que o usa der certo. Sem isto, uma
+ * inscrição recusada (mesma pessoa de novo, vaga fechada) deixava o currículo
+ * guardado sem dono — dado pessoal que nem a limpeza LGPD enxerga.
+ */
+export async function comArquivo<T>(arquivo: File | null, passo: (salvo: Arquivo | null) => Promise<T>): Promise<T> {
+  const salvo = await salvarArquivo(arquivo);
+  try {
+    return await passo(salvo);
+  } catch (erro) {
+    if (salvo) await apagarArquivos([salvo.id]).catch(() => {});
+    throw erro;
+  }
+}
+
+/**
+ * Arquivos guardados que não pertencem a ninguém (currículo trocado, sobra de
+ * tentativa antiga). Só os com mais de 1 hora: um upload em andamento ainda
+ * não tem dono gravado.
+ */
+export async function arquivosSemDono(banco: Banco, agora: Date): Promise<string[]> {
+  const usados = new Set<string>();
+  for (const p of banco.candidatos) if (p.curriculo) usados.add(p.curriculo.id);
+  for (const c of banco.candidaturas) if (c.avaliacao?.ficha) usados.add(c.avaliacao.ficha.id);
+  const limite = agora.getTime() - 60 * 60 * 1000;
+
+  if (modoSupabase()) return (await supa.listarArquivos()).filter((a) => !usados.has(a.id) && a.criado < limite).map((a) => a.id);
+  if (!fs.existsSync(PASTA_ARQUIVOS)) return [];
+  return fs
+    .readdirSync(PASTA_ARQUIVOS)
+    .map((nome) => ({ id: nome.split("__")[0], criado: fs.statSync(path.join(PASTA_ARQUIVOS, nome)).mtimeMs }))
+    .filter((a) => !usados.has(a.id) && a.criado < limite)
+    .map((a) => a.id);
+}
+
 export async function lerArquivo(id: string): Promise<{ nome: string; conteudo: Buffer } | null> {
   if (!/^arq_[a-z0-9]+$/.test(id)) return null;
   if (modoSupabase()) return supa.lerArquivo(id);

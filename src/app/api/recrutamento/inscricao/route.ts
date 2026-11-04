@@ -1,4 +1,4 @@
-import { salvarArquivo, transacao, lerBanco } from "@/lib/recrutamento/dados";
+import { comArquivo, transacao, lerBanco } from "@/lib/recrutamento/dados";
 import { ErroRegra, inscrever } from "@/lib/recrutamento/processo";
 
 /**
@@ -57,26 +57,28 @@ export async function POST(req: Request) {
     const vaga = (await lerBanco()).vagas.find((v) => v.slug === txt("vaga"));
     if (!vaga) throw new ErroRegra("Vaga não encontrada.");
     const arquivo = form.get("curriculo");
-    const curriculo = await salvarArquivo(arquivo instanceof File ? arquivo : null);
-    await transacao((b) =>
-      inscrever(
-        b,
-        {
-          nome: txt("nome"),
-          email: txt("email"),
-          telefone: txt("telefone"),
-          cidade: txt("cidade"),
-          bairro: txt("bairro"),
-          origem: txt("origem") || "Landing page",
-          resumo: txt("resumo"),
-          observacoes: "",
-          data_nascimento: txt("data_nascimento") || null,
-          consentimento: txt("consentimento") === "sim",
-        },
-        vaga.id,
-        curriculo,
-        null,
-        new Date()
+    // Inscrição recusada (mesma pessoa de novo, vaga fechada) não deixa o currículo guardado sem dono.
+    await comArquivo(arquivo instanceof File ? arquivo : null, (curriculo) =>
+      transacao((b) =>
+        inscrever(
+          b,
+          {
+            nome: txt("nome"),
+            email: txt("email"),
+            telefone: txt("telefone"),
+            cidade: txt("cidade"),
+            bairro: txt("bairro"),
+            origem: txt("origem") || "Landing page",
+            resumo: txt("resumo"),
+            observacoes: "",
+            data_nascimento: txt("data_nascimento") || null,
+            consentimento: txt("consentimento") === "sim",
+          },
+          vaga.id,
+          curriculo,
+          null,
+          new Date()
+        )
       )
     );
     // Resposta mínima: a landing page não precisa (nem deve) saber se a pessoa já existia no banco.
